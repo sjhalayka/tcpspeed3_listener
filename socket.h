@@ -27,6 +27,8 @@ public:
 	{
 		close();
 
+		close_tcp_socket = false;
+
 		tcp_socket = src_tcp_socket;
 		port_number = src_port_number;
 
@@ -46,6 +48,7 @@ public:
 protected:
 	SOCKET tcp_socket, accept_socket;
 	long unsigned int port_number;
+	bool close_tcp_socket;
 };
 
 class TCP_client

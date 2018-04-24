@@ -15,6 +15,7 @@ bool TCP_server::init(const long unsigned int src_port_number)
 	close();
 
 	port_number = src_port_number;
+	close_tcp_socket = true;
 
 	struct sockaddr_in my_addr;
 	int sock_addr_len = sizeof(struct sockaddr);
@@ -86,7 +87,7 @@ void TCP_server::close(void)
 	if (INVALID_SOCKET != accept_socket)
 		closesocket(accept_socket);
 
-	if (INVALID_SOCKET != tcp_socket)
+	if (INVALID_SOCKET != tcp_socket && true == close_tcp_socket)
 		closesocket(tcp_socket);
 
 	port_number = 0;
