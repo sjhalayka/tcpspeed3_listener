@@ -112,7 +112,7 @@ void thread_func(atomic_bool &stop, vector<string> &vs, mutex &m,
 
 				std::thread::id this_id = get_id();
 				ostringstream oss;
-				oss << "  " << "Thread id: " << this_id << " - " << bytes_per_second * mbits_factor << " Mbit/s, Record: " << record_bps * mbits_factor << " Mbit/s" << endl;
+				oss << "  " << "Thread id: " << this_id << " - " << bytes_per_second * mbits_factor << " Mbit/s, Record: " << record_bps * mbits_factor << " Mbit/s";
 
 				m.lock();
 				vs.push_back(oss.str());
