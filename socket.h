@@ -22,20 +22,9 @@ public:
 	TCP_server(void);
 	~TCP_server(void);
 	bool init(const long unsigned int src_port_number);
+	bool init(SOCKET src_tcp_socket, const long unsigned int src_port_number);
 
-	bool init(SOCKET src_tcp_socket, const long unsigned int src_port_number)
-	{
-		close();
-
-		close_tcp_socket = false;
-
-		tcp_socket = src_tcp_socket;
-		port_number = src_port_number;
-
-		return true;
-	}
-
-	SOCKET get_tcp_socket(void)
+	inline SOCKET get_tcp_socket(void)
 	{
 		return tcp_socket;
 	}

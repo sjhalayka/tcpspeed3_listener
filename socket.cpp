@@ -3,6 +3,8 @@
 TCP_server::TCP_server(void)
 {
 	tcp_socket = INVALID_SOCKET;
+	accept_socket = INVALID_SOCKET;
+	close_tcp_socket = true;
 }
 
 TCP_server::~TCP_server(void)
@@ -48,6 +50,18 @@ bool TCP_server::init(const long unsigned int src_port_number)
 		cout << "  Setting non-blocking mode failed, " << WSAGetLastError() << endl;
 		return false;
 	}
+
+	return true;
+}
+
+bool TCP_server::init(SOCKET src_tcp_socket, const long unsigned int src_port_number)
+{
+	close();
+
+	close_tcp_socket = false;
+
+	tcp_socket = src_tcp_socket;
+	port_number = src_port_number;
 
 	return true;
 }
