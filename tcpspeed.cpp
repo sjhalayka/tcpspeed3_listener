@@ -44,8 +44,7 @@ void thread_func(atomic_bool &stop, vector<string> &vs, mutex &m,
 
 		TCP_server ts;
 
-		if (false == ts.init(tcp_socket, port_number))
-			return; 
+		ts.init(tcp_socket, port_number);
 
 		while (!stop)
 		{
@@ -265,7 +264,9 @@ int main(int argc, char **argv)
 	vector<thread> threads;
 
 	TCP_server s;
-	s.init(port_number);
+
+	if (false == s.init(port_number))
+		return 2;
 
 	for (size_t i = 0; i < num_threads; i++)
 		threads.push_back(thread(thread_func, ref(stop), ref(vs), ref(m), s.get_tcp_socket(), port_number));
