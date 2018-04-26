@@ -1,6 +1,5 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
-#include <windows.h>
 #pragma comment(lib, "ws2_32")
 
 #include "socket.h"
@@ -55,21 +54,18 @@ void thread_func(atomic_bool &stop, vector<string> &vs, mutex &m,
 			}
 		}
 
-		long unsigned int start_loop_ticks = 0;
-		long unsigned int end_loop_ticks = 0;
-		long unsigned int elapsed_loop_ticks = 0;
-
-		long long unsigned int total_elapsed_ticks = 0;
-		long long unsigned int total_bytes_received = 0;
-		long long unsigned int last_reported_at_ticks = 0;
-		long long unsigned int last_reported_total_bytes_received = 0;
 
 		double record_bps = 0;
 		long unsigned int temp_bytes_received = 0;
+		double total_elapsed_time = 0;
+		double last_reported_at_time = 0;
+		long long unsigned int total_bytes_received = 0;
+		long long unsigned int last_reported_total_bytes_received = 0;
 
 		while (!stop)
 		{
-			start_loop_ticks = GetTickCount();
+
+			auto start = std::chrono::system_clock::now();
 
 			if (SOCKET_ERROR == (temp_bytes_received = ts.recv_data(rx_buf, rx_buf_size, 0)))
 			{
@@ -87,25 +83,23 @@ void thread_func(atomic_bool &stop, vector<string> &vs, mutex &m,
 				total_bytes_received += temp_bytes_received;
 			}
 
-			end_loop_ticks = GetTickCount();
+			auto end = std::chrono::system_clock::now();
 
-			if (end_loop_ticks < start_loop_ticks)
-				elapsed_loop_ticks = MAXDWORD - start_loop_ticks + end_loop_ticks;
-			else
-				elapsed_loop_ticks = end_loop_ticks - start_loop_ticks;
+			std::chrono::duration<double> elapsed_seconds = end - start;
 
-			total_elapsed_ticks += elapsed_loop_ticks;
+			total_elapsed_time += elapsed_seconds.count();
 
-			if (total_elapsed_ticks >= last_reported_at_ticks + 1000)
+			if (total_elapsed_time >= last_reported_at_time + 1)
 			{
 				long long unsigned int bytes_sent_received_between_reports = total_bytes_received - last_reported_total_bytes_received;
 
-				double bytes_per_second = static_cast<double>(bytes_sent_received_between_reports) / ((static_cast<double>(total_elapsed_ticks) - static_cast<double>(last_reported_at_ticks)) / 1000.0);
+				//double bytes_per_second = static_cast<double>(bytes_sent_received_between_reports) / ((static_cast<double>(total_elapsed_ticks) - static_cast<double>(last_reported_at_ticks)) / 1000.0);
+				double bytes_per_second = static_cast<double>(bytes_sent_received_between_reports) / (static_cast<double>(total_elapsed_time) - static_cast<double>(last_reported_at_time));
 
 				if (bytes_per_second > record_bps)
 					record_bps = bytes_per_second;
 
-				last_reported_at_ticks = total_elapsed_ticks;
+				last_reported_at_time = total_elapsed_time;
 				last_reported_total_bytes_received = total_bytes_received;
 
 				static const double mbits_factor = 8.0 / (1024.0 * 1024);
@@ -245,7 +239,7 @@ void cleanup(void)
 
 int main(int argc, char **argv)
 {
-	cout << endl << "tcpspeed 3.0 - TCP speed tester" << endl << "Copyright 2018, Shawn Halayka" << endl << endl;
+	cout << endl << "tcpspeed 3.1 - TCP speed tester" << endl << "Copyright 2018, Shawn Halayka" << endl << endl;
 
 	size_t num_threads = 10;
 	long unsigned int port_number = 0;
