@@ -10,6 +10,8 @@ using std::atomic_bool;
 #include <vector>
 using std::vector;
 
+#include <chrono>
+
 #include <thread>
 using std::thread;
 using std::this_thread::get_id;
